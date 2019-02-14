@@ -5,8 +5,8 @@
         <div v-if="recommends.length" class="slider-wrapper">
         <slider>
           <div v-for="item in recommends" :key="item.id">
-            <a href="item.linkUrl">
-              <img @load="loadImg" :src="item.picUrl">
+            <a :href="item.linkUrl">
+              <img class="needsClick" @load="loadImg" :src="item.picUrl">
             </a>
           </div>
         </slider>
@@ -16,7 +16,7 @@
         <ul>
           <li v-for="item in discList" :key="item.dissid" class="item">
             <div class="icon">
-              <img width="60" height="60" :src="item.imgurl">
+              <img width="60" height="60" v-lazy="item.imgurl">
             </div>
             <div class="text">
               <h2 class="name" v-html="item.dissname"></h2>
@@ -26,10 +26,14 @@
         </ul>
       </div>
       </div>
+      <div class="loading-container" v-show="!discList.length">
+        <Loading></Loading>
+      </div>
     </Scroll>
   </div>
 </template>
 <script>
+import Loading from 'base/loading/loading'
 import Scroll from 'base/scroll/scroll'
 import Slider from 'base/slider/slider'
 import {getRecommend, getDiscList} from 'api/recommend.js'
@@ -43,7 +47,8 @@ export default {
   },
   components: {
     Slider,
-    Scroll
+    Scroll,
+    Loading
   },
   created () {
     this._getRecommendList()
@@ -64,7 +69,7 @@ export default {
         }
       })
     },
-    loadImg() {
+    loadImg () {
       if (!this.checkLoaded) {
         this.$refs.scroll.refresh()
         this.checkLoaded = true
