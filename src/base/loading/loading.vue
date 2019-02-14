@@ -6,10 +6,10 @@
 </template>
 <script>
 export default {
-    props: {
-        title: String,
-        default: '正在载入...'
-    }
+  props: {
+    title: String,
+    default: '正在载入...'
+  }
 }
 </script>
 <style lang="stylus" scoped rel="stylesheet/stylus">
@@ -24,4 +24,3 @@ export default {
     }
 }
 </style>
-

@@ -1,12 +1,62 @@
 <template>
-
+  <scroll class="listView" :data="data" ref="listView">
+    <ul>
+      <li v-for="(group, index) in data" :key="index" class="list-group" ref="listGroup">
+        <h2 class="list-group-title">{{group.title}}</h2>
+        <ul>
+          <li v-for="item in group.items" :key="item.id" class="list-group-item">
+            <img v-lazy="item.avatar" class="avatar">
+            <span class="name">{{item.name}}</span>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <div class="list-shortcut" @touchstart="onShortCutTouchStart" @touchmove.stop.prevent="onShortCutTouchMove">
+      <ul>
+        <li class="item" v-for="(item, index) in shortcutList" :key="index" :data-index="index">
+          {{item}}
+        </li>
+      </ul>
+    </div>
+  </scroll>
 </template>
 <script>
+import Scroll from 'base/scroll/scroll'
+import {getData} from 'common/js/dom'
+
+const ANCHOR_HEIGHT = 18
 export default {
-  props: {
-    data: {
-      type: Array,
-      default: []
+  created () {
+    this.touch = {}
+  },
+  props: ['data'],
+  components: {
+    Scroll
+  },
+  computed: {
+    shortcutList () {
+      return this.data.map((group) => {
+        return group.title.substr(0, 1)
+      })
+    }
+  },
+  methods: {
+    onShortCutTouchStart (e) {
+      let anchorIndex = getData(e.target, 'index')
+      let firstTouch = e.touches[0]
+      this.touch.y1 = firstTouch.pageY
+      this.touch.anchorIndex = anchorIndex
+      this._scrollTo(anchorIndex)
+    },
+    onShortCutTouchMove (e) {
+      let firstTouch = e.touches[0]
+      this.touch.y2 = firstTouch.pageY
+      let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
+      let anchorIndex = this.touch.anchorIndex + delta
+      this._scrollTo(anchorIndex)
+    },
+    _scrollTo (index) {
+      this.$refs.listView.scrollToElement(this.$refs.listGroup[index], 0)
     }
   }
 }
@@ -14,7 +64,7 @@ export default {
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
 
-  .listview
+  .listView
     position: relative
     width: 100%
     height: 100%
