@@ -4,14 +4,29 @@
             <i class="icon-back"></i>
         </div>
         <h1 class="title" v-html="title"></h1>
-        <div class="bg-image" :style="bgStyle">
+        <div class="bg-image" :style="bgStyle" ref="bgImage">
             <div class="filter"></div>
         </div>
+        <scroll :data="songs" class="list" ref="list">
+          <div class="song-list-wrapper">
+            <song-list :songs="songs"></song-list>
+          </div>
+        </scroll>
     </div>
 </template>
 <script>
+import Scroll from 'base/scroll/scroll'
+import SongList from 'base/song-list/song-list'
+
 export default {
   props: ['bgImage', 'songs', 'title'],
+  components: {
+    Scroll,
+    SongList
+  },
+  mounted () {
+    this.$refs.list.$el.style.top = `${this.$refs.bgImage.clientHeight}px`
+  },
   computed: {
     bgStyle () {
       return `background-image:url(${this.bgImage})`
@@ -58,6 +73,7 @@ export default {
       padding-top: 70%
       transform-origin: top
       background-size: cover
+      z-index 9
       .play-wrapper
         position: absolute
         bottom: 20px
