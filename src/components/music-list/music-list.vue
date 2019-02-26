@@ -5,7 +5,7 @@
         </div>
         <h1 class="title" v-html="title"></h1>
         <div class="bg-image" :style="bgStyle" ref="bgImage">
-            <div class="filter"></div>
+            <div class="filter" ref="filter"></div>
         </div>
         <div class="bg-layer" ref="layer"></div>
         <scroll @scroll="scroll" :probe-type="probeType" :listen-scroll="listenScroll" :data="songs" class="list" ref="list">
@@ -49,7 +49,17 @@ export default {
     scrollY (newY) {
       let translateY = Math.max(this.minTranslateY, newY) // 因为是负值， 所以用max
       let zIndex = 0
+      let scale = 1
+      let blur = 0
       this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
+      const percent = Math.abs(newY / this.imageHeight)
+      if (newY > 0) {
+        scale = 1 + percent
+        zIndex = 10
+      } else {
+        blur = Math.min(20 * percent, 20)
+      }
+
       if (newY < this.minTranslateY) {
         zIndex = 10
         this.$refs.bgImage.style.paddingTop = 0
@@ -59,6 +69,9 @@ export default {
         this.$refs.bgImage.style.height = 0
       }
       this.$refs.bgImage.style.zIndex = zIndex
+      this.$refs.bgImage.style['transform'] = `scale(${scale})`
+      this.$refs.filter.style['backdrop-filter'] = `blur(${blur}px)`
+      this.$refs.filter.style['filter'] = `blur(${blur}px)`
     }
   },
   methods: {
